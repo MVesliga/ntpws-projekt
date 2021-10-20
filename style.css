@@ -6,3 +6,20 @@
 	position: relative;
 	height: 500px;
 }
+figure {
+    display: inline-block !important;
+    margin: 20px; /* adjust as needed */
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 1%;
+}
+figure img {
+    vertical-align: top;
+}
+figure figcaption {
+    text-align: center;
+}
+i {
+    color: black
+}
+  

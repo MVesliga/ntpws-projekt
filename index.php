@@ -1,4 +1,7 @@
 <?php 
+    # Database connection
+	include ("dbconnection.php");
+
     print '
     <!DOCTYPE HTML>
     <html>

@@ -1,4 +1,8 @@
 <?php 
+
+    # Start session
+    session_start();
+
     # Database connection
 	include ("dbconnection.php");
 
@@ -31,6 +35,11 @@
         <main class="container">
             <div class="row">
                 <div class="col-md-12">';
+
+                    if (isset($_SESSION['message'])) {
+                        print $_SESSION['message'];
+                        unset($_SESSION['message']);
+                    }
                     # Homepage
                     if (!isset($_GET['menu']) || $_GET['menu'] == 1) { include("home.php"); }
                     
@@ -45,9 +54,15 @@
 
                     # Gallery
                     else if ($_GET['menu'] == 5) { include("gallery.php"); }
+
+                    # Register
+                    else if ($_GET['menu'] == 6) { include("register.php"); }
+                    
+                    # Signin
+                    else if ($_GET['menu'] == 7) { include("signin.php"); }
             print '</div>
         </main>
-        <footer class="footer mt-auto py-3 bg-light">
+        <footer class="footer fixed-bottom mt-auto py-3 bg-light">
             <p style="text-align: center; font-size: 1.5rem;">Copyright &copy; 2021 Martin Vešliga. <a href="https://github.com/MVesliga?tab=repositories"><i class="fa fa-github"></i></a></p>
         </footer>
     </body>

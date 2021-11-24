@@ -6,6 +6,14 @@
     # Database connection
 	include ("dbconnection.php");
 
+    if(isset($_GET['menu'])) { $menu   = (int)$_GET['menu']; }
+	if(isset($_GET['action'])) { $action   = (int)$_GET['action']; }
+	
+	# Variables MUST BE STRINGS A-Z
+    if(!isset($_POST['_action_']))  { $_POST['_action_'] = FALSE;  }
+	
+	if (!isset($menu)) { $menu = 1; }
+
     print '
     <!DOCTYPE HTML>
     <html>
@@ -41,25 +49,28 @@
                         unset($_SESSION['message']);
                     }
                     # Homepage
-                    if (!isset($_GET['menu']) || $_GET['menu'] == 1) { include("home.php"); }
+                    if (!isset($menu) || $menu == 1) { include("home.php"); }
                     
                     # News
-                    else if ($_GET['menu'] == 2) { include("news.php"); }
+                    else if ($menu == 2) { include("news.php"); }
                     
                     # Contact
-                    else if ($_GET['menu'] == 3) { include("contact.php"); }
+                    else if ($menu == 3) { include("contact.php"); }
                     
                     # About us
-                    else if ($_GET['menu'] == 4) { include("about.php"); }
+                    else if ($menu == 4) { include("about.php"); }
 
                     # Gallery
-                    else if ($_GET['menu'] == 5) { include("gallery.php"); }
+                    else if ($menu == 5) { include("gallery.php"); }
 
                     # Register
-                    else if ($_GET['menu'] == 6) { include("register.php"); }
+                    else if ($menu == 6) { include("register.php"); }
                     
                     # Signin
-                    else if ($_GET['menu'] == 7) { include("signin.php"); }
+                    else if ($menu == 7) { include("signin.php"); }
+                    
+                    #Admin view
+                    else if ($menu == 8) { include("admin.php"); }
             print '</div>
         </main>
         <footer class="footer fixed-bottom mt-auto py-3 bg-light">

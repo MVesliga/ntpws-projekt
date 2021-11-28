@@ -8,15 +8,15 @@
 	
 	# Update user profile
 	if (isset($_POST['edit']) && $_POST['_action_'] == 'TRUE') {
-		$query  = "UPDATE users SET firstname='" . $_POST['firstname'] . "', lastname='" . $_POST['lastname'] . "', email='" . $_POST['email'] . "', username='" . $_POST['username'] . "', country='" . $_POST['country'] . "', archive='" . $_POST['archive'] . "'";
+		$query  = "UPDATE users SET firstname='" . $_POST['firstname'] . "', lastname='" . $_POST['lastname'] . "', email='" . $_POST['email'] . "', username='" . $_POST['username'] . "', country='" . $_POST['country'] . "', archive='" . $_POST['archive'] . "', userType='" . $_POST['userType'] . "'";
         $query .= " WHERE id=" . (int)$_POST['edit'];
         $query .= " LIMIT 1";
         $result = @mysqli_query($connection, $query);
 		
-		$_SESSION['message'] = '<p>You successfully changed user profile!</p>';
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully changed user profile!</p>';
 		
 		# Redirect
-		header("Location: index.php?menu=8&action=1");
+        echo("<script>location.href = 'index.php?menu=8&action=1;</script>");
 	}
 	# End update user profile
 	
@@ -28,10 +28,10 @@
 		$query .= " LIMIT 1";
 		$result = @mysqli_query($connection, $query);
 
-		$_SESSION['message'] = '<p>You successfully deleted user profile!</p>';
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully deleted user profile!</p>';
 		
 		# Redirect
-		header("Location: index.php?menu=8&action=1");
+        echo("<script>location.href = 'index.php?menu=8&action=1;</script>");
 	}
 	# End delete user profile
 	
@@ -87,8 +87,8 @@
             </div>
 				
 			<div class="form-group">
-                <label for="username">Username *<small>(Username must have min 5 and max 10 char)</small></label>
-                <input type="text" class="form-control" id="username" name="username" value="' . $row['username'] . '" pattern=".{5,10}" placeholder="Username.." required><br>
+                <label for="username">Username *<small>(Username must have min 4 and max 10 char)</small></label>
+                <input type="text" class="form-control" id="username" name="username" value="' . $row['username'] . '" pattern=".{4,10}" placeholder="Username.." required><br>
             </div>
 			
 			<div class="form-group">
@@ -110,6 +110,12 @@
                 <input type="radio" name="archive" value="Y"'; if($row['archive'] == 'Y') { echo ' checked="checked"'; $checked_archive = true; } echo ' /> YES &nbsp;&nbsp;
                 <input type="radio" name="archive" value="N"'; if($checked_archive == false) { echo ' checked="checked"'; } echo ' /> NO
             </div>
+            <div class="form-group">
+                <label for="userType">UserType:</label><br />
+                <input type="radio" name="userType" value="A"'; if($row['userType'] == 'A') { echo ' checked="checked"'; } echo ' /> Admin &nbsp;&nbsp;
+                <input type="radio" name="userType" value="E"'; if($row['userType'] == 'E') { echo ' checked="checked"'; } echo ' /> Editor &nbsp;&nbsp;
+                <input type="radio" name="userType" value="U"'; if($row['userType'] == 'U') { echo ' checked="checked"'; } echo ' /> User
+            </div>
 			<hr>
 			
 			<button type="submit" class="btn btn-primary">Submit</button>
@@ -129,6 +135,7 @@
 						<th>E mail</th>
 						<th>Country</th>
                         <th width=16>Activity</th>
+                        <th width=16>Type</th>
 						<th width=16></th>
                         <th width=16></th>
                         <th width=16></th>
@@ -155,6 +162,12 @@
                             else if ($row['archive'] == 'N') { print 'Active'; }
 						print '
 						</td>
+                        <td>';
+                            if ($row['userType'] == 'A') { print 'Admin'; }
+                            else if ($row['userType'] == 'E') { print 'Editor'; }
+                            else { print 'User'; }
+                        print '
+                        </td>
                         <td><a class="btn btn-outline-info" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;id=' .$row['id']. '"><i class="fa fa-user"></i></a></td>
 						<td><a class="btn btn-outline-secondary" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;edit=' .$row['id']. '"><i class="fa fa-edit"></a></td>
 						<td><a class="btn btn-outline-danger" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;delete=' .$row['id']. '"><i class="fa fa-trash"></a></td>

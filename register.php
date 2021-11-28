@@ -21,7 +21,7 @@
                         <small id="email" name="email" class="form-text text-muted">We\'ll never share your email with anyone else.</small>
                     </div>
                     <div class="form-group">
-                        <label for="username">Username:* <small>(Username must have min 5 and max 10 characters)</small></label>
+                        <label for="username">Username:* <small>(Username must have min 4 and max 10 characters)</small></label>
                         <input type="text" class="form-control" id="username" name="username" aria-describedby="userNameHelp" placeholder="Enter your username">
                     </div>
                     <div class="form-group">
@@ -52,19 +52,21 @@
             $query .= " OR username='" .  $_POST['username'] . "'";
             $result = @mysqli_query($connection, $query);
             $row = @mysqli_fetch_array($result, MYSQLI_ASSOC);
+            $_email = $row['email'] ?? '';
+            $_username = $row['username'] ?? '';
             
-            if ($row['email'] == '' || $row['username'] == '') {
+            if ($_email == '' || $_username == '' ) {
                 $pass_hash = password_hash($_POST['password'], PASSWORD_DEFAULT, ['cost' => 12]);
                 
                 $query  = "INSERT INTO users (firstname, lastname, email, username, password, country)";
                 $query .= " VALUES ('" . $_POST['firstName'] . "', '" . $_POST['lastName'] . "', '" . $_POST['email'] . "', '" . $_POST['username'] . "', '" . $pass_hash . "', '" . $_POST['country'] . "')";
                 $result = @mysqli_query($connection, $query);
                 
-                echo '<p>' . ucfirst(strtolower($_POST['firstName'])) . ' ' .  ucfirst(strtolower($_POST['lastName'])) . ', thank you for registration </p><br />
+                echo '<br><p class="alert alert-success">' . ucfirst(strtolower($_POST['firstName'])) . ' ' .  ucfirst(strtolower($_POST['lastName'])) . ', thank you for registration </p><br />
                 <hr>';
             }
             else {
-                echo '<p>User with this email or username already exist!</p>';
+                echo '<br><p class="alert alert-danger">User with this email or username already exist!</p>';
             }
         }
         print '

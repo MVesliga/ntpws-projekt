@@ -35,10 +35,10 @@
         }
 		
 		
-		$_SESSION['message'] .= '<p>You successfully added news!</p>';
+		$_SESSION['message'] .= '<br><p class="alert alert-success">You successfully added news!</p>';
 		
 		# Redirect
-		header("Location: index.php?menu=7&action=2");
+        echo("<script>location.href = 'index.php?menu=7&action=2;</script>");
 	}
 	
 	# Update news
@@ -67,10 +67,10 @@
 			}
         }
 		
-		$_SESSION['message'] = '<p>You successfully changed news!</p>';
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully changed news!</p>';
 		
 		# Redirect
-		header("Location: index.php?menu=7&action=2");
+        echo("<script>location.href = 'index.php?menu=7&action=2;</script>");
 	}
 	# End update news
 	
@@ -90,10 +90,10 @@
 		$query .= " LIMIT 1";
 		$result = @mysqli_query($connection, $query);
 
-		$_SESSION['message'] = '<p>You successfully deleted news!</p>';
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully deleted news!</p>';
 		
 		# Redirect
-		header("Location: index.php?menu=7&action=2");
+        echo("<script>location.href = 'index.php?menu=7&action=2;</script>");
 	}
 	# End delete news
 	
@@ -105,16 +105,29 @@
 		$query .= " ORDER BY date DESC";
 		$result = @mysqli_query($connection, $query);
 		$row = @mysqli_fetch_array($result);
-		print '
+
+        print '
 		<h2>News overview</h2>
-		<div class="news">
-			<img src="news/' . $row['picture'] . '" alt="' . $row['title'] . '" title="' . $row['title'] . '">
-			<h2>' . $row['title'] . '</h2>
-			' . $row['description'] . '
-			<time datetime="' . $row['date'] . '">' . pickerDateToMysql($row['date']) . '</time>
+		<div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                <div class="row">
+                    <figure>
+                        <img src="news/' . $row['picture'] . '" alt="' . $row['title'] . '" title="' . $row['title'] . '">
+                    </figure>
+                </div>
+                <hr>
+                <div class="news">
+                <h2>' . $row['title'] . '</h2>
+                <p>' . $row['description'] . '</p>
+                <time datetime="' . $row['date'] . '">' . pickerDateToMysql($row['date']) . '</time>
+                </div>  
+                </div>
+            </div>
 			<hr>
 		</div>
-		<p><a href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
+        <br>
+		<p><a class="btn btn-secondary" href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
 	}
 	
 	#Add news 
@@ -122,26 +135,36 @@
 		
 		print '
 		<h2>Add news</h2>
-		<form action="" id="news_form" name="news_form" method="POST" enctype="multipart/form-data">
+        <form style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; padding: 5%; border-radius: 10px;" action="" id="news_form" name="news_form" method=POST enctype="multipart/form-data">
 			<input type="hidden" id="_action_" name="_action_" value="add_news">
 			
-			<label for="title">Title *</label>
-			<input type="text" id="title" name="title" placeholder="News title.." required>
-			<label for="description">Description *</label>
-			<textarea id="description" name="description" placeholder="News description.." required></textarea>
-				
-			<label for="picture">Picture</label>
-			<input type="file" id="picture" name="picture">
-						
-			<label for="archive">Archive:</label><br />
-            <input type="radio" name="archive" value="Y"> YES &nbsp;&nbsp;
-			<input type="radio" name="archive" value="N" checked> NO
+            <div class="form-group">
+                <label for="title">Title*</label>
+                <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp" placeholder="Enter news title">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description*</label>
+                <textarea class="form-control" id="description" name="description" aria-describedby="descHelp" placeholder="Enter news description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="picture">Picture</label>
+                <input type="file" class="form-control-file" id="picture" name="picture">
+            </div>
+
+            <div class="form-group">
+                <label for="archive">Archive:</label><br />
+                <input type="radio" name="archive" value="Y"> YES &nbsp;&nbsp;
+			    <input type="radio" name="archive" value="N" checked> NO
+            </div>
 			
 			<hr>
 			
-			<input type="submit" value="Submit">
+			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
-		<p><a href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
+        <br>
+		<p><a class="btn btn-secondary" href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
 	}
 	#Edit news
 	else if (isset($_GET['edit']) && $_GET['edit'] != '') {
@@ -153,41 +176,51 @@
 
 		print '
 		<h2>Edit news</h2>
-		<form action="" id="news_form_edit" name="news_form_edit" method="POST" enctype="multipart/form-data">
+        <form style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; padding: 5%; border-radius: 10px;" action="" id="news_form_edit" name="news_form_edit" method=POST enctype="multipart/form-data">
 			<input type="hidden" id="_action_" name="_action_" value="edit_news">
 			<input type="hidden" id="edit" name="edit" value="' . $row['id'] . '">
-			
-			<label for="title">Title *</label>
-			<input type="text" id="title" name="title" value="' . $row['title'] . '" placeholder="News title.." required>
-			<label for="description">Description *</label>
-			<textarea id="description" name="description" placeholder="News description.." required>' . $row['description'] . '</textarea>
+
+            <div class="form-group">
+                <label for="title">Title*</label>
+                <input type="text" class="form-control" id="title" name="title" value="' . $row['title'] . '" placeholder="Enter news title">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description*</label>
+                <textarea class="form-control" id="description" name="description" aria-describedby="descHelp" placeholder="Enter news description">'. $row['description'] . '</textarea>
+            </div>
 				
-			<label for="picture">Picture</label>
-			<input type="file" id="picture" name="picture">
-						
-			<label for="archive">Archive:</label><br />
-            <input type="radio" name="archive" value="Y"'; if($row['archive'] == 'Y') { echo ' checked="checked"'; $checked_archive = true; } echo ' /> YES &nbsp;&nbsp;
-			<input type="radio" name="archive" value="N"'; if($checked_archive == false) { echo ' checked="checked"'; } echo ' /> NO
-			
+			<div class="form-group">
+                <label for="picture">Picture</label>
+                <input type="file" class="form-control-file" id="picture" name="picture">
+            </div>
+
+            <div class="form-group">
+                <label for="archive">Archive:</label><br />
+                <input type="radio" name="archive" value="Y"'; if($row['archive'] == 'Y') { echo ' checked="checked"'; $checked_archive = true; } echo ' /> YES &nbsp;&nbsp;
+			    <input type="radio" name="archive" value="N"'; if($checked_archive == false) { echo ' checked="checked"'; } echo ' /> NO
+			</div>
+
 			<hr>
 			
-			<input type="submit" value="Submit">
+			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
-		<p><a href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
+        <br>
+		<p><a class="btn btn-secondary" href="index.php?menu='.$menu.'&amp;action='.$action.'">Back</a></p>';
 	}
 	else {
 		print '
 		<h2>News</h2>
-		<div id="news">
-			<table>
+		<div>
+			<table  class="table">
 				<thead>
 					<tr>
-						<th width="16"></th>
-						<th width="16"></th>
-						<th width="16"></th>
 						<th>Title</th>
 						<th>Description</th>
 						<th>Date</th>
+						<th width="16">Activity</th>
+                        <th width="16"></th>
+						<th width="16"></th>
 						<th width="16"></th>
 					</tr>
 				</thead>
@@ -198,9 +231,6 @@
 				while($row = @mysqli_fetch_array($result)) {
 					print '
 					<tr>
-						<td><a href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;id=' .$row['id']. '"><img src="img/user.png" alt="user"></a></td>
-						<td><a href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;edit=' .$row['id']. '"><img src="img/edit.png" alt="uredi"></a></td>
-						<td><a href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;delete=' .$row['id']. '"><img src="img/delete.png" alt="obriši"></a></td>
 						<td>' . $row['title'] . '</td>
 						<td>';
 						if(strlen($row['description']) > 160) {
@@ -212,16 +242,19 @@
 						</td>
 						<td>' . pickerDateToMysql($row['date']) . '</td>
 						<td>';
-							if ($row['archive'] == 'Y') { print '<img src="img/inactive.png" alt="" title="" />'; }
-                            else if ($row['archive'] == 'N') { print '<img src="img/active.png" alt="" title="" />'; }
+							if ($row['archive'] == 'Y') { print 'Inactive'; }
+                            else if ($row['archive'] == 'N') { print 'Active'; }
 						print '
 						</td>
+                        <td><a class="btn btn-outline-info" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;id=' .$row['id']. '"><i class="fa fa-info"></i></a></td>
+						<td><a class="btn btn-outline-secondary" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;edit=' .$row['id']. '"><i class="fa fa-edit"></i></a></td>
+						<td><a class="btn btn-outline-danger" href="index.php?menu='.$menu.'&amp;action='.$action.'&amp;delete=' .$row['id']. '"><i class="fa fa-trash"></i></a></td>
 					</tr>';
 				}
 			print '
 				</tbody>
 			</table>
-			<a href="index.php?menu=' . $menu . '&amp;action=' . $action . '&amp;add=true" class="AddLink">Add news</a>
+			<a class="btn btn-primary" href="index.php?menu=' . $menu . '&amp;action=' . $action . '&amp;add=true">Add news</a>
 		</div>';
 	}
 	

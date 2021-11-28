@@ -1,6 +1,6 @@
 <?php 
 	if ($_SESSION['user']['valid'] == 'true') {
-		if (!isset($action)) { $action = 1; }
+		if (!isset($action)) { $action = 1;}
 		print '
 		<h1>Administration</h1>
 		<div>
@@ -30,6 +30,7 @@
 	}
 	else {
 		$_SESSION['message'] = '<p>Please register or login using your credentials!</p>';
-		header("Location: index.php?menu=7");
+		#header("Location: index.php?menu=7");
+        echo("<script>location.href = 'index.php?menu=7;</script>");
 	}
 ?>

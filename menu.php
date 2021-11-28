@@ -31,10 +31,13 @@
                       </li>';
                     }
                     else if ($_SESSION['user']['valid'] == 'true') {
+                      if ($_SESSION['user']['type'] == 'A'){
+                          print '
+                            <li class = "nav-item">
+                              <a class="nav-link" href="index.php?menu=8">Admin</a>
+                            </li>';
+                      }
                       print '
-                      <li class = "nav-item">
-                        <a class="nav-link" href="index.php?menu=8">Admin</a>
-                      </li>
                       <li class = "nav-item">
                         <a class="nav-link" href="signout.php">Sign Out</a>
                       </li>';

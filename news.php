@@ -1,36 +1,232 @@
-<?php 
-    print '
-        <div class="row">
-            <div class="col-md-12">
-                <h1>NEWS</h1>
-                    <div class="news">
-                        <a href="news-1.html"><img src="img/eco.jpeg" alt="Title Eco" title="Title Eco"></a>
-                        <h2><a href="news-1.html">ECO - Album of the universe by David Maxim Micic</a></h2>
-                        <p>Nulla ac turpis ac nisi pharetra viverra. Proin metus ex, aliquam eu accumsan ut, vulputate congue est.  <a href="news-1.html">More ...</a></p>
-                        <p><time datetime="2021-10-20">20 October 2021</time></p>
-                        <hr>
-                        <a href="news-2.html"><img src="img/falseIdol.jpeg" alt="Title False Idol" title="Title False Idol"></a>
-                        <h2><a href="news-2.html">Veil of Mayas False Idol album brings a refreshment to your ears.</a></h2>
-                        <p>Nulla ac turpis ac nisi pharetra viverra. Proin metus ex, aliquam eu accumsan ut, vulputate congue est.  <a href="news-2.html">More ...</a></p>
-                        <p><time datetime="2021-10-20">20 October 2021</time></p>
-                        <hr>
-                        <a href="news-3.html"><img src="img/sleepsSociety.jpeg" alt="Title Sleeps Society" title="Title Sleeps Society"></a>
-                        <h2><a href="news-3.html">While She Sleeps did it again with their new Album "Sleeps Society"!</a></h2>
-                        <p>Nulla ac turpis ac nisi pharetra viverra. Proin metus ex, aliquam eu accumsan ut, vulputate congue est.  <a href="news-3.html">More ...</a></p>
-                        <p><time datetime="2021-10-20">20 October 2021</time></p>
-                        <hr>
-                        <a href="news-4.html"><img src="img/sordidPink.jpeg" alt="Title Sordid Pink" title="Title Sordid Pink"></a>
-                        <h2><a href="news-4.html">Is Sordid Pink the pop album of 2020?</a></h2>
-                        <p>Nulla ac turpis ac nisi pharetra viverra. Proin metus ex, aliquam eu accumsan ut, vulputate congue est.  <a href="news-4.html">More ...</a></p>
-                        <p><time datetime="2021-10-20">20 October 2021</time></p>
-                        <hr>
-                        <a href="news-5.html"><img src="img/lavos.jpeg" alt="Title Lavos" title="Title Lavos"></a>
-                        <h2><a href="news-5.html">Lavos by Monuments is a pretty tight tune.</a></h2>
-                        <p>Nulla ac turpis ac nisi pharetra viverra. Proin metus ex, aliquam eu accumsan ut, vulputate congue est.  <a href="news-5.html">More ...</a></p>
-                        <p><time datetime="2021-10-20">20 October 2021</time></p>
-                        <hr>
-                    </div>
+<?php
+
+    function pickerDateToMysql($pickerDate){
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $pickerDate);
+        return $date->format('d. m. Y H:i:s');
+    } 
+
+    if (isset($_POST['_action_']) && $_POST['_action_'] == 'add_news') {
+		$_SESSION['message'] = '';
+		# htmlspecialchars — Convert special characters to HTML entities
+		# http://php.net/manual/en/function.htmlspecialchars.php
+		$query  = "INSERT INTO news (title, description, archive)";
+		$query .= " VALUES ('" . htmlspecialchars($_POST['title'], ENT_QUOTES) . "', '" . htmlspecialchars($_POST['description'], ENT_QUOTES) . "', '" . $_POST['archive'] . "')";
+		$result = @mysqli_query($connection, $query);
+		
+		$ID = mysqli_insert_id($connection);
+		
+		# picture
+        if($_FILES['picture']['error'] == UPLOAD_ERR_OK && $_FILES['picture']['name'] != "") {
+                
+			# strtolower - Returns string with all alphabetic characters converted to lowercase. 
+			# strrchr - Find the last occurrence of a character in a string
+			$ext = strtolower(strrchr($_FILES['picture']['name'], "."));
+			
+            $_picture = $ID . '-' . rand(1,100) . $ext;
+			copy($_FILES['picture']['tmp_name'], "news/".$_picture);
+			
+			if ($ext == '.jpg' || $ext == '.png' || $ext == '.gif') { # test if format is picture
+				$_query  = "UPDATE news SET picture='" . $_picture . "'";
+				$_query .= " WHERE id=" . $ID . " LIMIT 1";
+				$_result = @mysqli_query($connection, $_query);
+			}
+        }
+		
+		
+		$_SESSION['message'] .= '<br><p class="alert alert-success">You successfully added news!</p>';
+		
+		# Redirect
+        header("Location: index.php?menu=2");
+	}
+
+    if (isset($_POST['_action_']) && $_POST['_action_'] == 'edit_news') {
+		$query  = "UPDATE news SET title='" . htmlspecialchars($_POST['title'], ENT_QUOTES) . "', description='" . htmlspecialchars($_POST['description'], ENT_QUOTES) . "', archive='" . $_POST['archive'] . "'";
+        $query .= " WHERE id=" . (int)$_POST['edit'];
+        $query .= " LIMIT 1";
+        $result = @mysqli_query($connection, $query);
+		
+		# picture
+        if($_FILES['picture']['error'] == UPLOAD_ERR_OK && $_FILES['picture']['name'] != "") {
+                
+			# strtolower - Returns string with all alphabetic characters converted to lowercase. 
+			# strrchr - Find the last occurrence of a character in a string
+			$ext = strtolower(strrchr($_FILES['picture']['name'], "."));
+            
+			$_picture = (int)$_POST['edit'] . '-' . rand(1,100) . $ext;
+			copy($_FILES['picture']['tmp_name'], "news/".$_picture);
+			
+			
+			if ($ext == '.jpg' || $ext == '.png' || $ext == '.gif') { # test if format is picture
+				$_query  = "UPDATE news SET picture='" . $_picture . "'";
+				$_query .= " WHERE id=" . (int)$_POST['edit'] . " LIMIT 1";
+				$_result = @mysqli_query($connection, $_query);
+				$_SESSION['message'] .= '<p>You successfully added picture.</p>';
+			}
+        }
+		
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully changed news!</p>';
+		
+		# Redirect
+        header("Location: index.php?menu=2");
+	}
+
+    if (isset($_GET['delete']) && $_GET['delete'] != '') {
+		
+		# Delete picture
+        $query  = "SELECT picture FROM news";
+        $query .= " WHERE id=".(int)$_GET['action']." LIMIT 1";
+        $result = @mysqli_query($connection, $query);
+        $row = @mysqli_fetch_array($result);
+        @unlink("news/".$row['picture']); 
+		
+		# Delete news
+		$query  = "DELETE FROM news";
+		$query .= " WHERE id=".(int)$_GET['action'];
+		$query .= " LIMIT 1";
+		$result = @mysqli_query($connection, $query);
+
+		$_SESSION['message'] = '<br><p class="alert alert-success">You successfully deleted news!</p>';
+		
+		# Redirect
+        header("Location: index.php?menu=2");
+	}
+
+    
+
+	if (isset($_GET['add']) && $_GET['add'] != '') {
+		print '
+		<h2>Add news</h2>
+        <form style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; padding: 5%; border-radius: 10px;" action="" id="news_form" name="news_form" method=POST enctype="multipart/form-data">
+			<input type="hidden" id="_action_" name="_action_" value="add_news">
+			
+            <div class="form-group">
+                <label for="title">Title*</label>
+                <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp" placeholder="Enter news title">
             </div>
-        </div>
-    ';
+
+            <div class="form-group">
+                <label for="description">Description*</label>
+                <textarea class="form-control" id="description" name="description" aria-describedby="descHelp" placeholder="Enter news description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="picture">Picture</label>
+                <input type="file" class="form-control-file" id="picture" name="picture">
+            </div>
+
+            <div class="form-group">
+                <label for="archive">Archive:</label><br />
+                <input type="radio" name="archive" value="Y"> YES &nbsp;&nbsp;
+			    <input type="radio" name="archive" value="N" checked> NO
+            </div>
+			
+			<hr>
+			
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+        <br>
+		<p><a class="btn btn-secondary" href="index.php?menu=2">Back</a></p>';
+	} else if(isset($_GET['edit']) && $_GET['edit'] != '') {
+        $query  = "SELECT * FROM news";
+		$query .= " WHERE id=".$_GET['action'];
+		$result = @mysqli_query($connection, $query);
+		$row = @mysqli_fetch_array($result);
+		$checked_archive = false;
+        print '
+		<h2>Edit news</h2>
+        <form style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; padding: 5%; border-radius: 10px;" action="" id="news_form_edit" name="news_form_edit" method=POST enctype="multipart/form-data">
+			<input type="hidden" id="_action_" name="_action_" value="edit_news">
+			<input type="hidden" id="edit" name="edit" value="' . $row['id'] . '">
+
+            <div class="form-group">
+                <label for="title">Title*</label>
+                <input type="text" class="form-control" id="title" name="title" value="' . $row['title'] . '" placeholder="Enter news title">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description*</label>
+                <textarea class="form-control" id="description" name="description" aria-describedby="descHelp" placeholder="Enter news description">'. $row['description'] . '</textarea>
+            </div>
+				
+			<div class="form-group">
+                <label for="picture">Picture</label>
+                <input type="file" class="form-control-file" id="picture" name="picture">
+            </div>
+
+            <div class="form-group">
+                <label for="archive">Archive:</label><br />
+                <input type="radio" name="archive" value="Y"'; if($row['archive'] == 'Y') { echo ' checked="checked"'; $checked_archive = true; } echo ' /> YES &nbsp;&nbsp;
+			    <input type="radio" name="archive" value="N"'; if($checked_archive == false) { echo ' checked="checked"'; } echo ' /> NO
+			</div>
+
+			<hr>
+			
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+        <br>
+		<p><a class="btn btn-secondary" href="index.php?menu=2">Back</a></p>';
+    } else {
+        if (isset($action) && $action != '') {
+            $query  = "SELECT * FROM news";
+            $query .= " WHERE id=" . $_GET['action'];
+            $result = @mysqli_query($connection, $query);
+            $row = @mysqli_fetch_array($result);
+            print '
+            <h2>News overview</h2>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                    <div class="row">
+                        <figure>
+                            <img src="news/' . $row['picture'] . '" alt="' . $row['title'] . '" title="' . $row['title'] . '">
+                        </figure>
+                    </div>
+                    <hr>
+                    <div class="news">
+                    <h2>' . $row['title'] . '</h2>
+                    <p>' . $row['description'] . '</p>
+                    <time datetime="' . $row['date'] . '">' . pickerDateToMysql($row['date']) . '</time>
+                    </div>  
+                    </div>
+                </div>
+                <hr>
+            </div>
+            <br>
+            <p><a class="btn btn-secondary" href="index.php?menu='.$menu.'">Back</a></p>';
+        }
+        else {
+            print '<h1>NEWS</h1>';
+            $query  = "SELECT * FROM news";
+            $query .= " WHERE archive='N'";
+            $query .= " ORDER BY date DESC";
+            $result = @mysqli_query($connection, $query);
+    
+            if (mysqli_num_rows($result) == 0) {
+                print '<p>No news exist!</p><br>';
+            }
+    
+            while($row = @mysqli_fetch_array($result)) {
+                print '
+                <div class="news">
+                    <img src="news/' . $row['picture'] . '" alt="' . $row['title'] . '" title="' . $row['title'] . '">
+                    <h2>' . $row['title'] . '</h2>              
+                    <time datetime="' . $row['date'] . '">' . pickerDateToMysql($row['date']) . '</time>
+                    <br><br>
+                    <a class="btn btn-info" href="index.php?menu=' . $menu . '&amp;action=' . $row['id'] . '">More</a>';
+                    if ($_SESSION['user']['valid'] == 'true' && ($_SESSION['user']['type'] == 'A' || $_SESSION['user']['type'] == 'E')) {
+                       print '
+                       <a class="btn btn-secondary ml-2" href="index.php?menu=' . $menu . '&amp;action=' . $row['id'] . '&amp;edit=true">Edit</a>
+                       <a class="btn btn-danger ml-2" href="index.php?menu=' . $menu . '&amp;action=' . $row['id'] . '&amp;delete=true">Delete</a>
+                       ';    
+                    }
+                    print '
+                    <hr>
+                </div>';
+            }
+    
+            if ($_SESSION['user']['valid'] == 'true' && ($_SESSION['user']['type'] == 'A' || $_SESSION['user']['type'] == 'E')) {
+                print '<a class="btn btn-primary" href="index.php?menu=2&amp;add=true">Add news</a>';
+            }
+        }
+    }
 ?>

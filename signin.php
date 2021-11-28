@@ -25,19 +25,17 @@
 		$result = @mysqli_query($connection, $query);
 		$row = @mysqli_fetch_array($result, MYSQLI_ASSOC);
 		
-		if (password_verify($_POST['password'], $row['password'])) {
+		if ($row['archive'] == 'N' && password_verify($_POST['password'], $row['password'])) {
 			$_SESSION['user']['valid'] = 'true';
+			$_SESSION['user']['type'] = $row['userType'] ?? null;
 			$_SESSION['user']['id'] = $row['id'];
 			$_SESSION['user']['firstname'] = $row['firstname'];
 			$_SESSION['user']['lastname'] = $row['lastname'];
 			$_SESSION['message'] = '<p>Dobrodošli, ' . $_SESSION['user']['firstname'] . ' ' . $_SESSION['user']['lastname'] . '</p>';
 			header("Location: index.php?menu=1");
-		}
-		
-		# Bad username or password
-		else {
+		}else {
 			unset($_SESSION['user']);
-			$_SESSION['message'] = '<p>You entered wrong email or password!</p>';
+			$_SESSION['message'] = '<br><p class="alert alert-danger">You entered wrong email or password or your account has not been activated yet!</p>';
 			header("Location: index.php?menu=7");
 		}
 	}

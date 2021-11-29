@@ -42,7 +42,10 @@
                         <a class="nav-link" href="signout.php">Sign Out</a>
                       </li>';
                     }
-                    print '  
+                    print ' 
+                      <li class = "nav-item">
+                        <a class="nav-link" href="index.php?menu=9">Covid data</a>
+                      </li> 
                   </ul>
                 </div>
               </nav>
